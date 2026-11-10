@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Online store framework</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F5F7F8; --surface:#FFFFFF; --text:#1F2A33; --muted:#5B6873; --line:#DCE2E6;
+  --accent:#3E6F8E; --accent-soft:#E7EFF4; --accent-text:#FFFFFF; --chip:#EEF1F3;
+  color-scheme: light;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#14181C; --surface:#1B2126; --text:#E4E8EB; --muted:#98A4AE; --line:#2B343B;
+    --accent:#7FA9C4; --accent-soft:#212C34; --accent-text:#12191E; --chip:#242C33; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#14181C; --surface:#1B2126; --text:#E4E8EB; --muted:#98A4AE; --line:#2B343B;
+  --accent:#7FA9C4; --accent-soft:#212C34; --accent-text:#12191E; --chip:#242C33; color-scheme: dark;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:"Figtree",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.55;font-size:16px}
+.wrap{max-width:900px;margin:0 auto;padding:40px 20px 56px}
+h1{font-size:1.9rem;line-height:1.2;margin:0 0 8px;font-weight:700;letter-spacing:-0.01em}
+.lede{color:var(--muted);margin:0 0 28px;max-width:62ch}
+svg{display:block}
+.ic{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+
+.steps{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:0 0 20px;padding:0;list-style:none}
+.steps button{width:100%;background:var(--surface);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:10px 4px;font:inherit;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;transition:background .2s,border-color .2s}
+.steps button:hover{border-color:var(--accent)}
+.steps button:focus-visible,.nav button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.steps .n{width:34px;height:34px;border-radius:50%;background:var(--chip);color:var(--muted);padding:8px}
+.steps .t{font-weight:600;font-size:.85rem}
+.steps button[aria-current="step"]{background:var(--accent-soft);border-color:var(--accent)}
+.steps button[aria-current="step"] .n{background:var(--accent);color:var(--accent-text)}
+.steps button.done .n{background:var(--accent-soft);color:var(--accent)}
+
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:26px 24px}
+.panel h2{font-size:1.35rem;margin:0;font-weight:700}
+.q{color:var(--muted);margin:4px 0 0}
+.illus{margin:18px 0 6px;border:1px solid var(--line);border-radius:10px;background:var(--bg);padding:10px;overflow-x:auto}
+.illus svg{min-width:560px;width:100%;height:auto}
+.fa{fill:var(--accent)} .fs{fill:var(--accent-soft)} .fm{fill:var(--muted)} .fb{fill:var(--surface)}
+.sa{stroke:var(--accent);fill:none;stroke-width:2} .sl{stroke:var(--line);stroke-width:1.5} .sm{stroke:var(--muted);fill:none;stroke-width:1.5}
+.t{fill:var(--muted);font-size:13px;font-family:inherit} .tt{fill:var(--text);font-size:14px;font-weight:600;font-family:inherit} .ta{fill:var(--accent);font-size:13px;font-weight:600;font-family:inherit}
+
+.items{margin:14px 0 0;padding:0;list-style:none}
+.item{padding:18px 0;border-top:1px solid var(--line);display:grid;grid-template-columns:48px 1fr;gap:0 16px}
+.item:first-child{border-top:0}
+.tile{width:48px;height:48px;border-radius:12px;background:var(--accent-soft);color:var(--accent);padding:11px}
+.item h3{margin:0;font-size:1.05rem;font-weight:600}
+.item h3 small{color:var(--muted);font-weight:500;font-size:.85rem;margin-right:8px}
+.item p{margin:4px 0 0;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chips span{background:var(--chip);border-radius:6px;padding:3px 10px;font-size:.88rem}
+.badge{display:inline-block;margin-left:8px;font-size:.78rem;font-weight:600;color:var(--accent);background:var(--accent-soft);border-radius:6px;padding:1px 8px;vertical-align:2px}
+
+.nav{display:flex;justify-content:space-between;margin-top:20px;gap:12px}
+.nav button{font:inherit;font-weight:600;padding:10px 18px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--text);cursor:pointer;transition:background .2s,border-color .2s}
+.nav button.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-text)}
+.nav button:hover:not(:disabled){border-color:var(--accent)}
+.nav button:disabled{opacity:.4;cursor:default}
+.foot{color:var(--muted);font-size:.9rem;margin-top:22px}
+
+@media (max-width:640px){
+  .wrap{padding:28px 16px 44px}
+  .steps{grid-template-columns:1fr 1fr}
+  .panel{padding:20px 16px}
+  .item{grid-template-columns:40px 1fr;gap:0 12px}
+  .tile{width:40px;height:40px;padding:9px}
+}
+@media (prefers-reduced-motion: reduce){*{transition:none !important}}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <h1>Online store framework</h1>
+  <p class="lede">Five stages, each answering one question. Walk through them in order, or jump to any stage.</p>
+  <ol class="steps" id="steps"></ol>
+  <section class="panel" aria-live="polite">
+    <h2 id="title"></h2>
+    <p class="q" id="question"></p>
+    <div class="illus" id="illus" role="img" aria-label="Diagram for this stage"></div>
+    <ul class="items" id="items"></ul>
+  </section>
+  <div class="nav">
+    <button id="prev">Previous</button>
+    <button id="next" class="primary">Next</button>
+  </div>
+  <p class="foot">General by design. Fill in the details for each kind of store.</p>
+</main>
+
+<script>
+var IC = {
+ research:'<circle cx="11" cy="11" r="6.5"/><path d="M16 16l5 5"/>',
+ segment:'<circle cx="12" cy="12" r="9"/><path d="M12 3v9h9M12 12l-6.4 6.4"/>',
+ needs:'<path d="M4 5h16v11H9l-5 4z"/><path d="M8 9.5h8M8 12.5h5"/>',
+ choose:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.3" fill="currentColor"/>',
+ goals:'<path d="M6 21V4"/><path d="M6 4h12l-2.5 4 2.5 4H6"/>',
+ brand:'<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+ position:'<path d="M12 21s-7-6.2-7-11a7 7 0 0114 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/>',
+ price:'<path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8.5" r="1.2"/>',
+ box:'<path d="M3 7.5L12 3l9 4.5v9L12 21l-9-4.5z"/><path d="M3 7.5L12 12l9-4.5M12 12v9"/>',
+ message:'<path d="M3 10v4h4l8 5V5L7 10z"/><path d="M18 9a4 4 0 010 6"/>',
+ share:'<circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8.2 10.8l7.6-3.6M8.2 13.2l7.6 3.6"/>',
+ metrics:'<path d="M5 20v-9M12 20V5M19 20v-6"/>',
+ analytics:'<path d="M3 21h18"/><path d="M3 17l6-6 4 3 8-9"/>',
+ optimize:'<path d="M20 12a8 8 0 01-14 5M4 12a8 8 0 0114-5"/><path d="M18 3v4h-4M6 21v-4h4"/>',
+ store:'<path d="M4 9l1.5-5h13L20 9"/><path d="M4 9a2.7 2.7 0 005.3 0 2.7 2.7 0 005.4 0A2.7 2.7 0 0020 9"/><path d="M5 12v8h14v-8"/>',
+ cart:'<circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/><path d="M3 4h3l2.5 11h10l2-8H7"/>',
+ mail:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/>',
+ heart:'<path d="M12 20s-8-5-8-11a4.5 4.5 0 018-2.5A4.5 4.5 0 0120 9c0 6-8 11-8 11z"/>',
+ shield:'<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M8.5 12l2.5 2.5L15.5 10"/>',
+ layout:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M9 9v11"/>',
+ card:'<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M7 15h4"/>',
+ star:'<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/>',
+ gift:'<rect x="4" y="9" width="16" height="11" rx="1"/><path d="M3 9h18M12 9v11"/><path d="M12 9c-2.5 0-4-3.5-1.5-3.8C12 5 12 9 12 9zM12 9c2.5 0 4-3.5 1.5-3.8C12 5 12 9 12 9z"/>',
+ headset:'<path d="M4 14v-2a8 8 0 0116 0v2"/><rect x="3" y="14" width="4" height="6" rx="1.5"/><rect x="17" y="14" width="4" height="6" rx="1.5"/>',
+ users:'<circle cx="9" cy="8" r="3.2"/><path d="M3 20a6 6 0 0112 0"/><path d="M16 5a3.2 3.2 0 010 6M18 14.5a6 6 0 013 5.5"/>',
+ globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18"/>',
+ click:'<path d="M6 4l12 6-5.5 1.8L10.5 17z"/>',
+ journey:'<circle cx="4.5" cy="18" r="1.8"/><path d="M4.5 18c5 0 3-12 9-12H20"/><path d="M17 3l3 3-3 3"/>',
+ coin:'<circle cx="12" cy="12" r="9"/><path d="M14.5 9.2c-.5-1-1.5-1.4-2.5-1.4-1.5 0-2.5.8-2.5 1.9s1 1.6 2.5 2 2.5.9 2.5 2-1 1.9-2.5 1.9c-1.1 0-2.1-.5-2.6-1.5M12 6v1.8M12 16.2V18"/>'
+};
+function svg(n){ return '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">' + IC[n] + '</svg>'; }
+
+function node(cx,cy,label,anchor,dx){
+  return '<circle cx="'+cx+'" cy="'+cy+'" r="22" class="fs sa"/><text class="tt" x="'+cx+'" y="'+(cy+5)+'" text-anchor="middle" style="font-size:12px">'+label+'</text>';
+}
+function spark(x,y,pts,label){
+  return '<rect x="'+x+'" y="'+y+'" width="180" height="120" rx="10" class="fb sl"/><text class="t" x="'+(x+14)+'" y="'+(y+26)+'">'+label+'</text><polyline class="sa" stroke-linecap="round" stroke-linejoin="round" points="'+pts.map(function(p){return (x+p[0])+','+(y+p[1]);}).join(' ')+'"/>';
+}
+var ILLUS = [
+ // 1 Market: segment bubbles + competitors
+ '<svg viewBox="0 0 640 150"><circle cx="90" cy="78" r="34" class="fs sl"/><circle cx="185" cy="60" r="48" class="fa" opacity=".3"/><circle cx="285" cy="88" r="26" class="fs sl"/>' +
+ '<text class="t" x="90" y="82" text-anchor="middle">A</text><text class="tt" x="185" y="65" text-anchor="middle">B</text><text class="t" x="285" y="92" text-anchor="middle">C</text><text class="ta" x="185" y="132" text-anchor="middle">Best segment</text>' +
+ [0,1,2,3].map(function(i){var x=420+i*50;return '<rect x="'+x+'" y="38" width="34" height="26" rx="5" class="fm" opacity=".3"/><rect x="'+x+'" y="82" width="34" height="26" rx="5" class="fm" opacity=".3"/>';}).join('') +
+ '<rect x="470" y="60" width="34" height="26" rx="5" class="fa" style="display:none"/><text class="t" x="520" y="140" text-anchor="middle">Competitors</text></svg>',
+ // 2 Strategy: positioning map + price tiers
+ '<svg viewBox="0 0 640 150"><path class="sm" d="M40 125V14M40 125H290"/><text class="t" x="48" y="22">Quality</text><text class="t" x="262" y="143">Price</text>' +
+ '<g class="fm" opacity=".35"><circle cx="110" cy="95" r="7"/><circle cx="170" cy="70" r="7"/><circle cx="235" cy="100" r="7"/><circle cx="95" cy="45" r="7"/></g>' +
+ '<circle cx="205" cy="42" r="15" class="sa"/><circle cx="205" cy="42" r="7" class="fa"/><text class="ta" x="228" y="46">You</text>' +
+ '<circle cx="400" cy="92" r="18" class="fs sa"/><circle cx="480" cy="92" r="26" class="fa sa" style="fill-opacity:.3"/><circle cx="565" cy="92" r="34" class="fs sa"/>' +
+ '<text class="tt" x="400" y="97" text-anchor="middle">$</text><text class="tt" x="480" y="97" text-anchor="middle">$$</text><text class="tt" x="565" y="97" text-anchor="middle">$$$</text>' +
+ '<text class="t" x="400" y="146" text-anchor="middle">Cheap</text><text class="t" x="480" y="146" text-anchor="middle">Medium</text><text class="t" x="565" y="146" text-anchor="middle">Luxury</text></svg>',
+ // 3 Build: browser mockup
+ '<svg viewBox="0 0 640 150"><rect x="150" y="8" width="340" height="136" rx="10" class="fb sl"/><path class="sl" d="M150 32H490"/>' +
+ '<circle cx="168" cy="20" r="4" class="fm" opacity=".4"/><circle cx="182" cy="20" r="4" class="fm" opacity=".4"/><circle cx="196" cy="20" r="4" class="fm" opacity=".4"/>' +
+ '<rect x="170" y="46" width="120" height="86" rx="8" class="fs sl"/><path class="sm" d="M190 112l22-24 18 18 14-12 26 18"/><circle cx="262" cy="68" r="7" class="fm" opacity=".4"/>' +
+ '<rect x="310" y="48" width="130" height="10" rx="5" class="fm" opacity=".45"/><rect x="310" y="68" width="170" height="7" rx="3.5" class="fm" opacity=".25"/><rect x="310" y="82" width="150" height="7" rx="3.5" class="fm" opacity=".25"/>' +
+ '<rect x="310" y="104" width="90" height="28" rx="7" class="fa"/><text x="355" y="123" text-anchor="middle" style="fill:var(--accent-text);font-size:13px;font-weight:600;font-family:inherit">Buy now</text></svg>',
+ // 4 Attract: channels converging
+ '<svg viewBox="0 0 640 150"><path class="sl" d="M150 25L320 75M150 60L320 75M150 95L320 75M150 128L320 75"/>' +
+ '<rect x="60" y="10" width="90" height="30" rx="8" class="fs sa"/><text class="tt" x="105" y="30" text-anchor="middle">Search</text>' +
+ '<rect x="60" y="45" width="90" height="30" rx="8" class="fs sa"/><text class="tt" x="105" y="65" text-anchor="middle">Ads</text>' +
+ '<rect x="60" y="80" width="90" height="30" rx="8" class="fs sa"/><text class="tt" x="105" y="100" text-anchor="middle">Social</text>' +
+ '<rect x="60" y="113" width="90" height="30" rx="8" class="fs sa"/><text class="tt" x="105" y="133" text-anchor="middle">Marketplaces</text>' +
+ '<circle cx="360" cy="75" r="42" class="fa" opacity=".25"/><circle cx="360" cy="75" r="26" class="fa"/><text x="360" y="80" text-anchor="middle" style="fill:var(--accent-text);font-size:13px;font-weight:600;font-family:inherit">Store</text>' +
+ '<path class="sa" d="M420 75H520M508 66l12 9-12 9"/><text class="ta" x="540" y="80">Visitors</text></svg>',
+ // 5 Convert: horizontal funnel
+ '<svg viewBox="0 0 640 150"><path class="sm" d="M40 125H610"/>' +
+ [["Visit",100],["Product",80],["Cart",58],["Checkout",42],["Paid",28]].map(function(d,i){var x=60+i*112;return '<rect x="'+x+'" y="'+(125-d[1])+'" width="76" height="'+d[1]+'" rx="6" class="fa" opacity="'+(0.2+i*0.18)+'"/><text class="t" x="'+(x+38)+'" y="143" text-anchor="middle">'+d[0]+'</text>';}).join('') + '</svg>',
+ // 6 Retain: loop
+ '<svg viewBox="0 0 640 150"><circle cx="320" cy="75" r="50" class="sa" stroke-dasharray="5 5" opacity=".6"/>' +
+ node(320,25,'Buy') + node(370,75,'Email') + node(320,125,'Return') + node(270,75,'Refer') +
+ '<text class="ta" x="320" y="80" text-anchor="middle">Loop</text></svg>',
+ // 7 Measure: dashboard
+ '<svg viewBox="0 0 640 150">' + spark(40,15,[[14,95],[50,82],[90,86],[130,62],[166,44]],'Traffic') + spark(230,15,[[14,90],[50,84],[90,70],[130,66],[166,52]],'Conversion rate') + spark(420,15,[[14,48],[50,58],[90,66],[130,80],[166,92]],'Cost per sale') + '</svg>'
+];
+
+var GROW = '<svg viewBox="0 0 640 150">' +
+ [["Attract","Find the store",.15,40],["Convert","Become buyers",.3,250],["Retain","Come back",.45,460]].map(function(d){
+  return '<rect x="'+d[3]+'" y="30" width="140" height="56" rx="12" class="fa" opacity="'+d[2]+'"/><text class="tt" x="'+(d[3]+70)+'" y="64" text-anchor="middle" style="font-size:16px">'+d[0]+'</text><text class="t" x="'+(d[3]+70)+'" y="112" text-anchor="middle">'+d[1]+'</text>';
+ }).join('') +
+ '<path class="sa" d="M186 58H242M232 50l10 8-10 8M396 58H452M442 50l10 8-10 8"/></svg>';
+ILLUS = [ILLUS[0], ILLUS[1], ILLUS[2], GROW, ILLUS[6]];
+
+var STAGES = [
+ {name:"Market", icon:"research", q:"Who is buying, and who else is selling?", items:[
+  ["1.1","Competitors","See who else sells online, and what they do well.",["Direct rivals","Marketplaces","Prices","Reviews","Trends"],"research"],
+  ["1.2","Segments","Split buyers into groups who behave alike, then pick the ones worth pursuing.",["Demographics","Interests","Shopping habits","Reachability","Profitability"],"segment"],
+  ["1.3","Needs","Every segment has a “why”. Find it by asking.",["Interviews","Surveys","Reviews and comments","Search questions"],"needs"]
+ ]},
+ {name:"Strategy", icon:"choose", q:"How do we stand out?", items:[
+  ["2.1","Goals","Decide what success looks like, now that research shows what is realistic. Everything below depends on it.",["Sales","Subscribers","Awareness","Make it specific and measurable"],"goals",true],
+  ["2.2","Branding","How the store looks and feels at a glance.",["Logo and visuals","Tone of voice","First impression"],"brand"],
+  ["2.3","Positioning","What makes us different, and where we sit in people’s minds.",["Uniqueness","Quality spectrum","Perception"],"position"],
+  ["2.4","Pricing and offer","Cheap, medium or luxury, and what the customer gets for it. Check the margin here.",["Price level","Discounts","Shipping and returns","Guarantees"],"price"]
+ ]},
+ {name:"Build", icon:"store", q:"Is the store ready to convert?", items:[
+  ["3.1","Website","The store itself is part of your marketing.",["Speed","Mobile-friendly","Easy navigation"],"layout"],
+  ["3.2","Product pages","Where most buying decisions happen.",["Photos and video","Clear description","Price and stock"],"store"],
+  ["3.3","Checkout","Make paying quick and painless.",["Few steps","Payment options","Guest checkout"],"card"],
+  ["3.4","Trust signals","Reassure first-time visitors.",["Reviews","Secure payment badges","Clear contact details"],"shield"],
+  ["3.5","Tracking setup","Put it in place before launch, or later results can’t be measured.",["Analytics","Sales tracking","Cost per order"],"metrics"]
+ ]},
+ {name:"Grow", icon:"analytics", q:"How do people find us, buy, and come back?", items:[
+  ["4.1","Attract","Get the right people to the store.",["Search","Paid ads","Social and influencers","Marketplaces"],"message"],
+  ["4.2","Convert","Turn visitors into buyers.",["Clear buy button","Cart recovery","Limited-time offers","Free shipping"],"cart"],
+  ["4.3","Retain","Bring buyers back and keep them happy.",["Email","Loyalty rewards","Referrals","Support and returns"],"heart"]
+ ]},
+ {name:"Measure", icon:"metrics", q:"Did it work, and what do we change?", items:[
+  ["5.1","Metrics","Numbers tied back to the goals, one or more per goal and per growth step.",["Traffic","Conversion rate","Cost per sale","Repeat purchases"],"metrics"],
+  ["5.2","Analytics","Reports that explain what the numbers mean.",["Dashboards","Which channel worked","Cart drop-off"],"analytics"],
+  ["5.3","Test and adjust","Use the numbers to improve the next round.",["A/B tests","Shift budget","Fix drop-offs"],"optimize"]
+ ]}
+];
+
+var cur = 0;
+var stepsEl = document.getElementById("steps");
+var itemsEl = document.getElementById("items");
+var prev = document.getElementById("prev");
+var next = document.getElementById("next");
+
+function el(tag, cls, text){
+  var e = document.createElement(tag);
+  if(cls) e.className = cls;
+  if(text !== undefined) e.textContent = text;
+  return e;
+}
+
+function renderSteps(){
+  stepsEl.textContent = "";
+  STAGES.forEach(function(s, i){
+    var li = document.createElement("li");
+    var b = el("button");
+    b.type = "button";
+    if(i === cur) b.setAttribute("aria-current","step");
+    if(i < cur) b.className = "done";
+    var n = el("span","n");
+    n.innerHTML = svg(s.icon);
+    b.appendChild(n);
+    b.appendChild(el("span","t", s.name));
+    b.addEventListener("click", function(){ go(i); });
+    li.appendChild(b);
+    stepsEl.appendChild(li);
+  });
+}
+
+function renderPanel(){
+  var s = STAGES[cur];
+  document.getElementById("title").textContent = (cur + 1) + ". " + s.name;
+  document.getElementById("question").textContent = s.q;
+  document.getElementById("illus").innerHTML = ILLUS[cur];
+  itemsEl.textContent = "";
+  s.items.forEach(function(it){
+    var li = el("li","item");
+    var tile = el("div","tile");
+    tile.innerHTML = svg(it[4]);
+    li.appendChild(tile);
+    var body = document.createElement("div");
+    var h = el("h3");
+    h.appendChild(el("small","", it[0]));
+    h.appendChild(document.createTextNode(it[1]));
+    if(it[5]) h.appendChild(el("span","badge","Set after research"));
+    body.appendChild(h);
+    body.appendChild(el("p","", it[2]));
+    var chips = el("div","chips");
+    it[3].forEach(function(c){ chips.appendChild(el("span","", c)); });
+    body.appendChild(chips);
+    li.appendChild(body);
+    itemsEl.appendChild(li);
+  });
+  prev.disabled = cur === 0;
+  next.disabled = cur === STAGES.length - 1;
+}
+
+function go(i){
+  cur = Math.max(0, Math.min(STAGES.length - 1, i));
+  renderSteps();
+  renderPanel();
+  document.getElementById("title").scrollIntoView({block:"nearest"});
+}
+prev.addEventListener("click", function(){ go(cur - 1); });
+next.addEventListener("click", function(){ go(cur + 1); });
+renderSteps();
+renderPanel();
+</script>
+</body>
+</html>
